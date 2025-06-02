@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>济事楼导览系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, #3498db, #1a5f9e);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .logo-text {
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+        }
+
+        .search-box button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .search-box button:hover {
+            background: #2980b9;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            margin-top: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-item:hover {
+            background: #f5f9ff;
+        }
+
+        .suggestion-item i {
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .suggestion-item .room-number {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 60px;
+        }
+
+        .suggestion-item .room-purpose {
+            flex: 1;
+            color: #555;
+        }
+
+        .content {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .map-container {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .info-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .info-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
+        .room-info {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .room-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: #eaf6ff;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .room-purpose {
+            font-size: 18px;
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .personnel-section {
+            margin-top: 15px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .personnel-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .person-tag {
+            background: #e1f0fa;
+            color: #2980b9;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .no-personnel {
+            color: #95a5a6;
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            transform: translateY(30px);
+            transition: transform 0.4s;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #3498db, #1a5f9e);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 25px;
+            line-height: 1.6;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-label i {
+            color: #3498db;
+            font-size: 20px;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #555;
+            font-size: 18px;
+        }
+        
+        /* 图钉样式 */
+        .map-marker {
+            position: absolute;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .map-marker .pin {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            background: #ff4757;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        
+        .map-marker .pin::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        
+        .map-marker .room-label {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .map-marker:hover .room-label {
+            opacity: 1;
+        }
+        
+        .map-marker.active .pin {
+            background: #2ed573;
+            transform: rotate(-45deg) scale(1.2);
+        }
+        
+        .map-marker.active .room-label {
+            opacity: 1;
+            background: #2ed573;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        /* 启动画面 */
+        #startup-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.8s ease-out;
+            z-index: 3000;
+            cursor: pointer;
+        }
+        
+        #startup-inner {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        #startup-text {
+            color: #2c3e50;
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        #startup-subtitle {
+            color: #3498db;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        #startup-hint {
+            color: #7f8c8d;
+            font-size: 1em;
+        }
+
+        .hint-text {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            animation: pulse 2s infinite;
+            z-index: 100;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1100px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .info-panel {
+                width: 100%;
+                height: auto;
+            }
+            
+            .map-container {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .logo {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            #startup-inner {
+                padding: 30px;
+                width: 90%;
+            }
+            
+            #startup-text {
+                font-size: 2em;
+            }
+
+            .hint-text {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-container {
+                height: 400px;
+            }
+            
+            .modal-body {
+                padding: 15px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            #startup-text {
+                font-size: 1.8em;
+            }
+            
+            #startup-subtitle {
+                font-size: 1em;
+            }
+
+            .hint-text {
+                font-size: 12px;
+                bottom: 10px;
+            }
+            
+            .map-marker .room-label {
+                font-size: 10px;
+                top: -30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 启动画面 -->
+    <div id="startup-screen">
+        <div id="startup-inner">
+            <div id="startup-text">济事楼导览系统</div>
+            <div id="startup-subtitle">同济大学济事楼4楼虚拟导览平台</div>
+            <div id="startup-hint">点击任意位置继续 <i class="fas fa-arrow-down"></i></div>
+        </div>
+    </div>
+    
+    <div class="container" id="main-content" style="display: none;">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>济事楼导览系统</h1>
+                    <p>同济大学济事楼4楼虚拟导览平台</p>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索房间号、用途或人员...">
+                    <button id="search-button"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+                <div class="suggestions-box" id="suggestions-box"></div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="map-container">
+                <div class="hint-text">点击地图上的坐标点查看房间信息</div>
+                <img src="assert/map.jpg" alt="济事楼4楼地图" class="map-image" id="floor-map">
+                <!-- 坐标点将通过JS动态添加 -->
+            </div>
+            
+            <div class="info-panel">
+                <div class="info-header">
+                    <h2><i class="fas fa-info-circle"></i> 房间信息总览</h2>
+                </div>
+                
+                <div class="room-info" id="room-info-container">
+                    <!-- 房间信息将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">房间详细信息</div>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-door-open"></i> 房间号</div>
+                    <div class="info-value" id="modal-room">-</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-building"></i> 用途</div>
+                    <div class="info-value" id="modal-purpose">-</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-users"></i> 人员</div>
+                    <div class="info-value" id="modal-personnel">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer" style="display: none;">
+        <p>同济大学济事楼导览系统 &copy; 2025 | 计算机科学与技术学院</p>
+    </div>
+
+    <script>
+        // 房间数据
+        const roomData = [
+            {
+                "room_number": "407",
+                "purpose": "多媒体教室Ⅱ",
+                "personnel": []
+            },
+            {
+                "room_number": "408",
+                "purpose": "多媒体教室Ⅲ",
+                "personnel": []
+            },
+            {
+                "room_number": "409",
+                "purpose": "研究生工作室",
+                "personnel": []
+            },
+            {
+                "room_number": "410",
+                "purpose": "教研室",
+                "personnel": ["王冬青", "李江峰", "夏波涌", "张颖"]
+            },
+            {
+                "room_number": "412",
+                "purpose": "教研室",
+                "personnel": ["刘岩", "张惠娟", "孙萍", "罗怡桂"]
+            },
+            {
+                "room_number": "414",
+                "purpose": "硬件实验室",
+                "personnel": []
+            },
+            {
+                "room_number": "416",
+                "purpose": "计算机房Ⅲ",
+                "personnel": []
+            },
+            {
+                "room_number": "417",
+                "purpose": "会议室",
+                "personnel": []
+            },
+            {
+                "room_number": "418",
+                "purpose": "教授办公室",
+                "personnel": ["张林", "江建慧", "刘琴"]
+            },
+            {
+                "room_number": "419",
+                "purpose": "嵌入式系统实验室",
+                "personnel": []
+            },
+            {
+                "room_number": "426",
+                "purpose": "计算机房Ⅱ",
+                "personnel": []
+            },
+            {
+                "room_number": "428",
+                "purpose": "服务器室",
+                "personnel": []
+            },
+            {
+                "room_number": "430",
+                "purpose": "计算机房Ⅰ",
+                "personnel": []
+            },
+            {
+                "room_number": "432",
+                "purpose": "党员之家",
+                "personnel": []
+            },
+            {
+                "room_number": "434",
+                "purpose": "多媒体教室Ⅰ",
+                "personnel": []
+            },
+            {
+                "room_number": "441",
+                "purpose": "会议室",
+                "personnel": []
+            },
+            {
+                "room_number": "442L",
+                "purpose": "教务办公室",
+                "personnel": ["刘梦露", "李慧敏", "王彩霞", "杨丹", "姚仕仪"]
+            },
+            {
+                "room_number": "442R",
+                "purpose": "学院办公室",
+                "personnel": ["闫鹏", "张晶", "林伊凡", "张晓雅", "钱银飞", "王昊榕", "俞晓静"]
+            },
+            {
+                "room_number": "443",
+                "purpose": "实验中心",
+                "personnel": ["陈梁", "杨旻", "严海洲"]
+            },
+            {
+                "room_number": "444",
+                "purpose": "档案室",
+                "personnel": []
+            },
+            {
+                "room_number": "446",
+                "purpose": "学生工作办公室",
+                "personnel": ["张砚秋", "丁瑞庭", "葛蕾", "焦嘉欣", "钟梦莹", "陈璞皎"]
+            },
+            {
+                "room_number": "448",
+                "purpose": "副书记办公室",
+                "personnel": ["陈荣", "吴晓培"]
+            },
+            {
+                "room_number": "450L",
+                "purpose": "党委书记办公室",
+                "personnel": ["熊岚"]
+            },
+            {
+                "room_number": "450R",
+                "purpose": "院长办公室",
+                "personnel": ["申恒涛"]
+            },
+            {
+                "room_number": "451",
+                "purpose": "副院长办公室",
+                "personnel": ["王成", "何良华", "张林"]
+            },
+            {
+                "room_number": "455",
+                "purpose": "会议室",
+                "personnel": []
+            },
+            {
+                "room_number": "456",
+                "purpose": "党委办公室",
+                "personnel": ["周微微", "陆凤兰", "赵清理"]
+            }
+        ];
+
+        // 房间坐标点（根据真实地图布局调整）
+        const roomPoints = {
+              "407": { x: 0.65, y: 0.48 },
+              "408": { x: 0.75, y: 0.58 },
+              "409": { x: 0.61, y: 0.55 },
+              "410": { x: 0.71, y: 0.65 },
+              "412": { x: 0.67, y: 0.72 },
+              "414": { x: 0.53, y: 0.85 },
+              "416": { x: 0.44, y: 0.85 },
+              "417": { x: 0.44, y: 0.68 },
+              "418": { x: 0.34, y: 0.85 },
+              "419": { x: 0.34, y: 0.68 },
+              "426": { x: 0.10, y: 0.70 },
+              "428": { x: 0.10, y: 0.66 },
+              "430": { x: 0.12, y: 0.50 },
+              "432": { x: 0.12, y: 0.38 },
+              "434": { x: 0.12, y: 0.35 },
+              "441": { x: 0.31, y: 0.22 },
+              "442L": { x: 0.22, y: 0.37 },
+              "442R": { x: 0.30, y: 0.38 },
+              "443": { x: 0.35, y: 0.22 },
+              "444": { x: 0.33, y: 0.38 },
+              "446": { x: 0.37, y: 0.38 },
+              "448": { x: 0.41, y: 0.36 },
+              "450L": { x: 0.44, y: 0.34 },
+              "450R": { x: 0.50, y: 0.28 },
+              "451": { x: 0.42, y: 0.20 },
+              "455": { x: 0.47, y: 0.06 },
+              "456": { x: 0.55, y: 0.15 }
+        };
+
+        // DOM元素
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const suggestionsBox = document.getElementById('suggestions-box');
+        const roomInfoContainer = document.getElementById('room-info-container');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeModal = document.getElementById('close-modal');
+        const modalRoom = document.getElementById('modal-room');
+        const modalPurpose = document.getElementById('modal-purpose');
+        const modalPersonnel = document.getElementById('modal-personnel');
+        const startupScreen = document.getElementById('startup-screen');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.querySelector('.footer');
+        const mapContainer = document.querySelector('.map-container');
+        const mapImage = document.getElementById('floor-map');
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', () => {
+            // 设置启动画面点击事件
+            startupScreen.addEventListener('click', () => {
+                // 淡出启动画面
+                startupScreen.style.animation = 'fadeOut 0.8s ease-out forwards';
+                
+                // 显示主内容
+                setTimeout(() => {
+                    startupScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    footer.style.display = 'block';
+                    
+                    // 渲染房间卡片
+                    renderRoomCards();
+                    // 创建坐标点
+                    createRoomMarkers();
+                    setupEventListeners();
+                }, 800);
+            });
+        });
+
+        // 创建房间坐标点
+        function createRoomMarkers() {
+            // 清除任何可能存在的现有标记
+            document.querySelectorAll('.map-marker').forEach(marker => marker.remove());
+            
+            // 获取地图容器尺寸
+            const mapRect = mapContainer.getBoundingClientRect();
+            const mapWidth = mapRect.width;
+            const mapHeight = mapRect.height;
+            
+            // 为每个房间创建坐标点
+            for (const room in roomPoints) {
+                if (roomPoints.hasOwnProperty(room)) {
+                    const point = roomPoints[room];
+                    const roomDataItem = roomData.find(r => r.room_number === room);
+                    
+                    if (roomDataItem) {
+                        const marker = document.createElement('div');
+                        marker.className = 'map-marker';
+                        marker.dataset.room = room;
+                        
+                        // 将百分比坐标转换为实际像素坐标
+                        marker.style.left = `${point.x * 100}%`;
+                        marker.style.top = `${point.y * 100}%`;
+                        
+                        marker.innerHTML = `
+                            <div class="pin"></div>
+                            <div class="room-label">${room} ${roomDataItem.purpose}</div>
+                        `;
+                        
+                        marker.addEventListener('click', function(e) {
+                            // 移除之前活动标记的样式
+                            document.querySelectorAll('.map-marker').forEach(m => {
+                                m.classList.remove('active');
+                            });
+                            
+                            // 给当前标记添加活动样式
+                            this.classList.add('active');
+                            
+                            // 显示房间信息
+                            showRoomModal(roomDataItem);
+                            
+                            // 防止冒泡到地图容器
+                            e.stopPropagation();
+                        });
+                        
+                        mapContainer.appendChild(marker);
+                    }
+                }
+            }
+        }
+
+        // 渲染房间卡片
+        function renderRoomCards() {
+            roomInfoContainer.innerHTML = '';
+            
+            roomData.forEach(room => {
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+                roomCard.dataset.room = room.room_number;
+                
+                let personnelHTML = '';
+                if (room.personnel.length > 0) {
+                    personnelHTML = room.personnel.map(person => 
+                        `<div class="person-tag">${person}</div>`
+                    ).join('');
+                } else {
+                    personnelHTML = '<div class="no-personnel">暂无人员信息</div>';
+                }
+                
+                roomCard.innerHTML = `
+                    <div class="room-header">
+                        <div class="room-number">${room.room_number}</div>
+                        <div class="room-purpose">${room.purpose}</div>
+                    </div>
+                    <div class="personnel-section">
+                        <div class="section-title"><i class="fas fa-user-friends"></i> 人员信息</div>
+                        <div class="personnel-list">
+                            ${personnelHTML}
+                        </div>
+                    </div>
+                `;
+                
+                roomCard.addEventListener('click', () => {
+                    // 高亮显示对应的坐标点
+                    document.querySelectorAll('.map-marker').forEach(marker => {
+                        marker.classList.remove('active');
+                        if (marker.dataset.room === room.room_number) {
+                            marker.classList.add('active');
+                        }
+                    });
+                    showRoomModal(room);
+                });
+                
+                roomInfoContainer.appendChild(roomCard);
+            });
+        }
+
+        // 显示房间模态框
+        function showRoomModal(room) {
+            modalRoom.textContent = room.room_number;
+            modalPurpose.textContent = room.purpose;
+            
+            // 清空人员区域
+            modalPersonnel.innerHTML = '';
+            
+            if (room.personnel.length > 0) {
+                room.personnel.forEach(person => {
+                    const personTag = document.createElement('div');
+                    personTag.className = 'person-tag';
+                    personTag.textContent = person;
+                    modalPersonnel.appendChild(personTag);
+                });
+            } else {
+                const noPersonnel = document.createElement('div');
+                noPersonnel.className = 'no-personnel';
+                noPersonnel.textContent = '暂无人员信息';
+                modalPersonnel.appendChild(noPersonnel);
+            }
+            
+            modalOverlay.classList.add('active');
+        }
+
+        // 关闭模态框
+        function closeRoomModal() {
+            // 移除所有活动标记
+            document.querySelectorAll('.map-marker').forEach(marker => {
+                marker.classList.remove('active');
+            });
+            
+            modalOverlay.classList.remove('active');
+        }
+
+        // 搜索功能
+        function searchRooms(query) {
+            if (!query.trim()) return [];
+            
+            const lowerQuery = query.toLowerCase();
+            
+            return roomData.filter(room => {
+                // 检查房间号
+                if (room.room_number.toLowerCase().includes(lowerQuery)) return true;
+                
+                // 检查用途
+                if (room.purpose.toLowerCase().includes(lowerQuery)) return true;
+                
+                // 检查人员
+                if (room.personnel.some(person => 
+                    person.toLowerCase().includes(lowerQuery))) return true;
+                
+                return false;
+            });
+        }
+
+        // 显示搜索建议
+        function showSuggestions() {
+            const query = searchInput.value.trim();
+            suggestionsBox.innerHTML = '';
+            
+            if (query.length < 2) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            
+            const results = searchRooms(query);
+            
+            if (results.length === 0) {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = '<i class="fas fa-exclamation-circle"></i> 未找到匹配的房间';
+                suggestionsBox.appendChild(item);
+            } else {
+                results.slice(0, 8).forEach(room => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `
+                        <i class="fas fa-door-open"></i>
+                        <div class="room-number">${room.room_number}</div>
+                        <div class="room-purpose">${room.purpose}</div>
+                    `;
+                    
+                    item.addEventListener('click', () => {
+                        // 高亮显示对应的坐标点
+                        document.querySelectorAll('.map-marker').forEach(marker => {
+                            marker.classList.remove('active');
+                            if (marker.dataset.room === room.room_number) {
+                                marker.classList.add('active');
+                            }
+                        });
+                        
+                        showRoomModal(room);
+                        suggestionsBox.style.display = 'none';
+                        searchInput.value = '';
+                    });
+                    
+                    suggestionsBox.appendChild(item);
+                });
+            }
+            
+            suggestionsBox.style.display = 'block';
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 搜索输入事件
+            searchInput.addEventListener('input', showSuggestions);
+            
+            // 搜索按钮点击事件
+            searchButton.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (query) {
+                    const results = searchRooms(query);
+                    if (results.length > 0) {
+                        // 高亮显示对应的坐标点
+                        document.querySelectorAll('.map-marker').forEach(marker => {
+                            marker.classList.remove('active');
+                            if (marker.dataset.room === results[0].room_number) {
+                                marker.classList.add('active');
+                            }
+                        });
+                        
+                        showRoomModal(results[0]);
+                    }
+                }
+                suggestionsBox.style.display = 'none';
+            });
+            
+            // 关闭模态框
+            closeModal.addEventListener('click', closeRoomModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeRoomModal();
+                }
+            });
+            
+            // 点击外部关闭搜索建议
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && 
+                    !suggestionsBox.contains(e.target) && 
+                    !searchButton.contains(e.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+            
+            // 点击地图容器关闭活动标记和模态框
+            mapContainer.addEventListener('click', () => {
+                document.querySelectorAll('.map-marker').forEach(marker => {
+                    marker.classList.remove('active');
+                });
+                closeRoomModal();
+            });
+        }
+    </script>
+</body>
+</html>
